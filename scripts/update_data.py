@@ -3,7 +3,7 @@ from datetime import date
 from bs4 import BeautifulSoup
 
 SCHOLAR_ID = "TxioLDYAAAAJ"
-SINTA_JOURNAL_ID = "292"
+SINTA_JOURNAL_ID = "13830"
 DATA_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data.json")
 
 def load_existing():
