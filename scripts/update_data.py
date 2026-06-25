@@ -3,16 +3,21 @@ from datetime import date
 from bs4 import BeautifulSoup
 
 SCHOLAR_ID = "TxioLDYAAAAJ"
+SINTA_JOURNAL_ID = "292"
 DATA_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data.json")
 
-def scrape():
-    scraper = cloudscraper.create_scraper()
+def load_existing():
+    if os.path.exists(DATA_FILE):
+        with open(DATA_FILE) as f:
+            return json.load(f)
+    return {}
+
+def scrape_gs(scraper):
     resp = scraper.get(
         f"https://scholar.google.com/citations?user={SCHOLAR_ID}&hl=en",
         timeout=30,
     )
     soup = BeautifulSoup(resp.text, "html.parser")
-
     c = h = i10 = 0; cs = hs = i10s = 0
     tbl = soup.find("table", id="gsc_rsb_st")
     if tbl:
@@ -29,7 +34,6 @@ def scrape():
             if lbl == "Citations": c, cs = vs[0], vs[1]
             elif lbl == "h-index": h, hs = vs[0], vs[1]
             elif lbl == "i10-index": i10, i10s = vs[0], vs[1]
-
     years = []
     hist = soup.find("div", class_="gsc_md_hist_b")
     if hist:
@@ -40,16 +44,37 @@ def scrape():
         years.sort(key=lambda x: x["y"])
     return {"citations": c, "citations_since": cs, "hindex": h, "i10index": i10, "years": years}
 
+def scrape_sinta(scraper):
+    result = {}
+    try:
+        resp = scraper.get(
+            f"https://sinta.kemdiktisaintek.go.id/journals/profile/{SINTA_JOURNAL_ID}",
+            timeout=20,
+        )
+        soup = BeautifulSoup(resp.text, "html.parser")
+        nums = soup.find_all("div", class_="stat-num")
+        if len(nums) >= 3:
+            result["sinta_impact"] = float(nums[0].get_text(strip=True))
+            result["sinta_rank"] = nums[2].get_text(strip=True)
+    except Exception as e:
+        print(f"SINTA scrape failed: {e}", file=sys.stderr)
+    return result
+
 for attempt in range(3):
     try:
-        out = scrape()
-        if out["citations"] > 0:
+        scraper = cloudscraper.create_scraper()
+        gs = scrape_gs(scraper)
+        if gs["citations"] > 0:
+            existing = load_existing()
+            out = {**existing, **gs}
+            sinta = scrape_sinta(scraper)
+            out.update(sinta)
             out["updated"] = date.today().isoformat()
-            if not out["years"]:
+            if not out.get("years"):
                 out["years"] = [{"y": y, "c": 0} for y in range(2020, 2027)]
             with open(DATA_FILE, "w", encoding="utf-8") as f:
-                json.dump(out, f, ensure_ascii=False)
-            print(f"OK: {json.dumps(out)}")
+                json.dump(out, f, ensure_ascii=False, indent=2)
+            print(f"OK: citations={out['citations']} sinta_rank={out.get('sinta_rank','?')}")
             sys.exit(0)
         else:
             print(f"Attempt {attempt+1}: got zeros", file=sys.stderr)
