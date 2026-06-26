@@ -39,9 +39,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .h-logo svg{width:14px;height:14px}
 .h-logo img{width:14px;height:14px;object-fit:contain}
 
-/* Wayang badge untuk SINTA cards */
-.wayang-badge{position:absolute;top:5px;right:5px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;z-index:5}
-.wayang-badge img{width:80%;height:80%;object-fit:contain}
+/* Wayang badge untuk SINTA cards - di dalam kartu sebelah kanan */
+.wayang-badge{position:absolute;top:50%;right:5px;transform:translateY(-50%);width:40px;height:40px;display:flex;align-items:center;justify-content:center;z-index:5}
+.wayang-badge img{width:100%;height:100%;object-fit:contain}
 
 /* Baris bawah: angka + label */
 .h-bottom{margin-top:6px}
@@ -100,15 +100,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 </head>
 <body>
 <div class="widget">
-  <div id="content"><div class="loading">Memuat data…</div></div>
+  <div id="content"><div class="loading">Memuat dataï¿½</div></div>
   <div class="footer">
-    <span class="footer-left">Last updated: <span id="updated">—</span></span>
+    <span class="footer-left">Last updated: <span id="updated">ï¿½</span></span>
     <span class="footer-right">Alsina Journal Statistics</span>
   </div>
 </div>
 
 <script>
-/* SVG dekorasi batik — motif kawung sederhana, inline, tidak butuh file eksternal */
+/* SVG dekorasi batik ï¿½ motif kawung sederhana, inline, tidak butuh file eksternal */
 function batikSVG(color){
   return '<svg xmlns="http://www.w3.org/2000/svg" width="70" height="70" viewBox="0 0 70 70">' +
     '<g fill="none" stroke="' + color + '" stroke-width="1.4">' +
@@ -175,7 +175,7 @@ var LOGOS = {
       for (var i = 0; i < cards.length; i++) {
         var c = cards[i];
         var logoHtml = c.isWayang
-          ? '<div class="h-logo"><img src="sinta-logo.png" alt="SINTA"></div>'
+          ? ''
           : '<div class="h-logo">' + LOGOS[c.logoKey] + '</div>';
         var badgeHtml = c.isWayang
           ? '<div class="wayang-badge"><img src="sinta-logo.png" alt="SINTA Wayang"></div>'
