@@ -16,7 +16,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   border-radius:7px;
   padding:10px 12px;
   color:#fff;
-  overflow:hidden;
+  overflow:visible;
   display:flex;
   flex-direction:column;
   justify-content:space-between;
@@ -34,25 +34,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   justify-content:space-between;
   gap:4px;
 }
-.h-platform{
-  font-size:11px;
-  font-weight:700;
-  letter-spacing:.3px;
-  opacity:.95;
-  line-height:1;
-}
-.h-logo{
-  width:22px;
-  height:22px;
-  border-radius:50%;
-  background:rgba(255,255,255,.18);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  flex-shrink:0;
-}
+.h-platform{font-size:11px;font-weight:700;letter-spacing:.3px;opacity:.95;line-height:1;}
+.h-logo{width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .h-logo svg{width:14px;height:14px}
 .h-logo img{width:14px;height:14px;object-fit:contain}
+
+/* Wayang badge untuk SINTA cards */
+.wayang-badge{position:absolute;top:-15px;right:10px;width:40px;height:40px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.2);z-index:5;overflow:hidden;border:2px solid rgba(255,255,255,.5)}
+.wayang-badge img{width:80%;height:80%;object-fit:contain}
 
 /* Baris bawah: angka + label */
 .h-bottom{margin-top:6px}
@@ -111,110 +100,112 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 </head>
 <body>
 <div class="widget">
-  <div id="content"><div class="loading">Memuat data…</div></div>
+  <div id="content"><div class="loading">Memuat data�</div></div>
   <div class="footer">
-    <span class="footer-left">Last updated: <span id="updated">—</span></span>
+    <span class="footer-left">Last updated: <span id="updated">�</span></span>
     <span class="footer-right">Alsina Journal Statistics</span>
   </div>
 </div>
 
 <script>
-/* SVG dekorasi batik — motif kawung sederhana, inline, tidak butuh file eksternal */
+/* SVG dekorasi batik � motif kawung sederhana, inline, tidak butuh file eksternal */
 function batikSVG(color){
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="70" height="70" viewBox="0 0 70 70">
-    <g fill="none" stroke="${color}" stroke-width="1.4">
-      <!-- pola kawung 3x3 -->
-      ${[17,35,53].flatMap(cx=>[17,35,53].map(cy=>`
-        <ellipse cx="${cx}" cy="${cy}" rx="7" ry="10"/>
-        <ellipse cx="${cx}" cy="${cy}" rx="10" ry="7"/>
-      `)).join('')}
-    </g>
-  </svg>`;
+  return '<svg xmlns="http://www.w3.org/2000/svg" width="70" height="70" viewBox="0 0 70 70">' +
+    '<g fill="none" stroke="' + color + '" stroke-width="1.4">' +
+    [17,35,53].flatMap(function(cx){return [17,35,53].map(function(cy){return (
+      '<ellipse cx="' + cx + '" cy="' + cy + '" rx="7" ry="10"/>' +
+      '<ellipse cx="' + cx + '" cy="' + cy + '" rx="10" ry="7"/>'
+    )})}).join('') +
+    '</g></svg>';
 }
 
-/* SVG logo sederhana untuk tiap platform */
-const LOGOS = {
-  scopus:`<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect width="24" height="24" rx="4" fill="#fff"/>
-    <path d="M4 8h6l2 3-2 3H4l2-3-2-3z" fill="#E87722"/>
-    <path d="M10 8h10v2H12l1.5 1.5L12 13h8v2H10l-3-3.5L10 8z" fill="#0070C0"/>
-  </svg>`,
-  sinta:`<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect width="24" height="24" rx="4" fill="#fff"/>
-    <text x="12" y="17" text-anchor="middle" font-size="13" font-weight="900" fill="#c8920c" font-family="Arial">S</text>
-  </svg>`,
-  impact:`<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect width="24" height="24" rx="4" fill="#fff"/>
-    <polyline points="3,17 8,10 13,13 18,6" stroke="#b03030" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-    <circle cx="18" cy="6" r="2" fill="#b03030"/>
-  </svg>`,
-  gs:`<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect width="24" height="24" rx="4" fill="#fff"/>
-    <text x="12" y="17" text-anchor="middle" font-size="15" font-weight="900" fill="#2e9e5a" font-family="Arial">G</text>
-  </svg>`
+/* SVG logo untuk tiap platform */
+var LOGOS = {
+  scopus:'<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="24" height="24" rx="4" fill="#fff"/><path d="M4 8h6l2 3-2 3H4l2-3-2-3z" fill="#E87722"/><path d="M10 8h10v2H12l1.5 1.5L12 13h8v2H10l-3-3.5L10 8z" fill="#0070C0"/></svg>',
+  gs:'<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="24" height="24" rx="4" fill="#fff"/><text x="12" y="17" text-anchor="middle" font-size="15" font-weight="900" fill="#2e9e5a" font-family="Arial">G</text></svg>'
 };
 
-(async () => {
-  try {
-    const res = await fetch('data.json?_=' + Date.now());
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const d = await res.json();
-    document.getElementById('updated').textContent = d.updated || '—';
+(function() {
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', 'data.json?_=' + Date.now(), true);
+  xhr.onload = function() {
+    try {
+      if (xhr.status !== 200) throw new Error('HTTP ' + xhr.status);
+      var d = JSON.parse(xhr.responseText);
+      document.getElementById('updated').textContent = d.updated || '\u2014';
 
-    const cards = [
-      {
-        cls:'h-scopus',
-        platform:'Scopus<sup style="font-size:6px;vertical-align:super">®</sup>',
-        logoKey:'scopus',
-        val:`<a href="https://drive.google.com/file/d/1av2ykkPbgM9BW9CZ_uXf098YXFBO7G2Z/view?usp=sharing" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">${d.scopus_citedness ?? '—'}</a>`,
-        lbl:'Citedness in Scopus',
-        deco:'#fff'
-      },
-      {
-        cls:'h-sinta',
-        platform:'SINTA',
-        logoKey:'sinta',
-        val: d.sinta_rank ?? '—',
-        lbl:'SINTA Accreditation',
-        deco:'#fff'
-      },
-      {
-        cls:'h-impact',
-        platform:'SINTA Impact',
-        logoKey:'impact',
-        val: d.sinta_impact ?? '—',
-        lbl:'SINTA Journal Impact',
-        deco:'#fff'
-      },
-      {
-        cls:'h-gs',
-        platform:'Google Scholar',
-        logoKey:'gs',
-        val: d.citations,
-        lbl:'Citations in Google Scholar',
-        deco:'#fff'
+      var cards = [
+        {
+          cls:'h-scopus',
+          platform:'Scopus<sup style="font-size:6px;vertical-align:super">\u00ae</sup>',
+          logoKey:'scopus',
+          val:'<a href="https://drive.google.com/file/d/1av2ykkPbgM9BW9CZ_uXf098YXFBO7G2Z/view?usp=sharing" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">' + (d.scopus_citedness ?? '\u2014') + '</a>',
+          lbl:'Citedness in Scopus',
+          deco:'#fff',
+          isWayang: false
+        },
+        {
+          cls:'h-sinta',
+          platform:'SINTA',
+          val: d.sinta_rank ?? '\u2014',
+          lbl:'SINTA Accreditation',
+          deco:'#fff',
+          isWayang: true
+        },
+        {
+          cls:'h-impact',
+          platform:'SINTA Impact',
+          val: d.sinta_impact ?? '\u2014',
+          lbl:'SINTA Journal Impact',
+          deco:'#fff',
+          isWayang: true
+        },
+        {
+          cls:'h-gs',
+          platform:'Google Scholar',
+          logoKey:'gs',
+          val: d.citations,
+          lbl:'Citations in Google Scholar',
+          deco:'#fff',
+          isWayang: false
+        }
+      ];
+
+      var html = '<div class="hero">';
+      for (var i = 0; i < cards.length; i++) {
+        var c = cards[i];
+        var logoHtml = c.isWayang
+          ? '<div class="h-logo"><img src="sinta-logo.png" alt="SINTA"></div>'
+          : '<div class="h-logo">' + LOGOS[c.logoKey] + '</div>';
+        var badgeHtml = c.isWayang
+          ? '<div class="wayang-badge"><img src="sinta-logo.png" alt="SINTA Wayang"></div>'
+          : '';
+        html += '<div class="h-item ' + c.cls + '">' +
+          badgeHtml +
+          '<div class="h-top">' +
+          '<div class="h-platform">' + c.platform + '</div>' +
+          logoHtml +
+          '</div>' +
+          '<div class="h-bottom">' +
+          '<div class="h-val">' + c.val + '</div>' +
+          '<div class="h-lbl">' + c.lbl + '</div>' +
+          '</div>' +
+          '<div class="h-deco">' + batikSVG(c.deco) + '</div>' +
+          '</div>';
       }
-    ];
+      html += '</div>';
 
-    document.getElementById('content').innerHTML = `<div class="hero">${
-      cards.map(c=>`
-        <div class="h-item ${c.cls}">
-          <div class="h-top">
-            <div class="h-platform">${c.platform}</div>
-            <div class="h-logo">${LOGOS[c.logoKey]}</div>
-          </div>
-          <div class="h-bottom">
-            <div class="h-val">${c.val}</div>
-            <div class="h-lbl">${c.lbl}</div>
-          </div>
-          <div class="h-deco">${batikSVG(c.deco)}</div>
-        </div>
-      `).join('')
-    }</div>`;
-  } catch(e) {
-    document.getElementById('content').innerHTML = '<div class="error">Gagal memuat data: ' + e.message + '</div>';
-    document.getElementById('updated').textContent = '—';
-  }
+      document.getElementById('content').innerHTML = html;
+    } catch(e) {
+      document.getElementById('content').innerHTML = '<div class="error">Gagal memuat data: ' + e.message + '</div>';
+      document.getElementById('updated').textContent = '\u2014';
+    }
+  };
+  xhr.onerror = function() {
+    document.getElementById('content').innerHTML = '<div class="error">Gagal memuat data</div>';
+    document.getElementById('updated').textContent = '\u2014';
+  };
+  xhr.send();
 })();
 </script>
 </body>
