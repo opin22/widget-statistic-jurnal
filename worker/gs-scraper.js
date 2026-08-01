@@ -79,20 +79,18 @@ export default {
       }
 
       const years = [];
-      const hist = html.match(/gsc_md_hist_b[\s\S]*?<\/div>/i);
-      if (hist) {
-        const labels = [];
-        for (const m of hist[0].matchAll(/gsc_g_t[^>]*>([^<]*)</gi))
-          labels.push(m[1].trim());
-        const bars = [];
-        for (const m of hist[0].matchAll(/gsc_g_a[^>]*>(\d+)</gi))
-          bars.push(parseInt(m[1], 10));
-        for (let i = 0; i < labels.length; i++) {
-          const y = parseInt(labels[i], 10);
-          if (!isNaN(y) && bars[i] !== undefined) years.push({ y, c: bars[i] });
-        }
-        years.sort((a, b) => a.y - b.y);
+      const yearSpans = [
+        ...html.matchAll(/<span class="gsc_g_t"[^>]*>(\d{4})<\/span>/gi),
+      ];
+      const barVals = [
+        ...html.matchAll(/gsc_g_a[^>]*>[\s\S]*?gsc_g_al[^>]*>(\d+)</gi),
+      ];
+      for (let i = 0; i < yearSpans.length; i++) {
+        const y = parseInt(yearSpans[i][1], 10);
+        const c = barVals[i] ? parseInt(barVals[i][1], 10) : 0;
+        years.push({ y, c });
       }
+      years.sort((a, b) => a.y - b.y);
 
       const data = {
         citations,
