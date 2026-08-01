@@ -1,0 +1,6 @@
+name = "gs-scraper"
+main = "gs-scraper.js"
+compatibility_date = "2025-06-01"
+
+[vars]
+# SECRET_TOKEN is injected at deploy time via `wrangler secret put` or dashboard.
