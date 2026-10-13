@@ -12,22 +12,8 @@ def make_scraper():
 SCHOLAR_ID = "TxioLDYAAAAJ"
 SINTA_JOURNAL_ID = "13830"
 DATA_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data.json")
-SHARED_DATA_URL = "https://opin22.github.io/alsina-scholar-widget/data.json"
 GS_URL = f"https://scholar.google.com/citations?user={SCHOLAR_ID}&hl=en"
 UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
-
-def try_shared_data():
-    try:
-        resp = requests.get(SHARED_DATA_URL, params={"_": int(time.time())}, timeout=30)
-        if resp.status_code == 200:
-            data = resp.json()
-            if data.get("citations", 0) > 0:
-                print(f"SHARED OK: citations={data['citations']} updated={data.get('updated')}")
-                return data
-            print(f"SHARED data invalid: {data}", file=sys.stderr)
-    except Exception as e:
-        print(f"SHARED fetch failed: {e}", file=sys.stderr)
-    return None
 
 def load_existing():
     if os.path.exists(DATA_FILE):
@@ -128,14 +114,6 @@ def scrape_sinta():
     except Exception as e:
         print(f"SINTA scrape failed: {e}", file=sys.stderr)
     return result
-
-shared = try_shared_data()
-if shared:
-    shared.setdefault("years", [{"y": y, "c": 0} for y in range(2020, 2027)])
-    with open(DATA_FILE, "w", encoding="utf-8") as f:
-        json.dump(shared, f, ensure_ascii=False, indent=2)
-    print(f"Done (shared): citations={shared['citations']}")
-    sys.exit(0)
 
 existing = load_existing()
 out = dict(existing)
